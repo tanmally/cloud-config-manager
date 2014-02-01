@@ -3,6 +3,7 @@ package com.bbytes.config.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -32,20 +33,20 @@ public class RedisConfigReaderWriter implements IConfigReaderWriter {
 	}
 
 	@Override
-	public void saveCCProperty(CCProperty property, String project,
-			String environment) throws CloudConfigException {
+	public void saveCCProperty(CCProperty property, String project, String environment) throws CloudConfigException {
+
+		if (property == null)
+			return;
 
 		checkProjectAndEnvironmentExist(project, environment);
 
 		String ccPropertyJson = null;
 		try {
 			ccPropertyJson = jsonMapper.writeValueAsString(property);
-			propertyLevelOps.leftPush(project + ":" + environment + ":"
-					+ property.getPropertyName(), ccPropertyJson);
+			propertyLevelOps.leftPush(project + ":" + environment + ":" + property.getPropertyName(), ccPropertyJson);
 
 			// add it to proj:env combo
-			List<CCProperty> ccProperties = getProjectEnvCCProperties(project,
-					environment);
+			List<CCProperty> ccProperties = getProjectEnvCCProperties(project, environment);
 			ccProperties.add(property);
 			projectLevelOps.leftPush(project + ":" + environment, convertProperty(ccProperties));
 
@@ -56,10 +57,37 @@ public class RedisConfigReaderWriter implements IConfigReaderWriter {
 	}
 
 	@Override
-	public CCProperty getCCProperty(String propertyName, String project,
-			String environment) throws CloudConfigException {
-		List<String> result = propertyLevelOps.range(project + ":"
-				+ environment + ":" + propertyName, 0, 0);
+	public void deleteCCProperty(CCProperty property, String project, String environment) throws CloudConfigException {
+
+		if (property == null)
+			return;
+
+		checkProjectAndEnvironmentExist(project, environment);
+
+		// remove from prop level ops
+		propertyLevelOps.leftPop(project + ":" + environment + ":" + property.getPropertyName());
+
+		// remove it from proj:env combo
+		List<CCProperty> ccProperties = getProjectEnvCCProperties(project, environment);
+		List<CCProperty> ccPropertiesToBeUpdated = new ArrayList<CCProperty>();
+		for (Iterator<CCProperty> iterator = ccProperties.iterator(); iterator.hasNext();) {
+			CCProperty ccProperty = (CCProperty) iterator.next();
+			if (!ccProperty.getPropertyName().equals(property.getPropertyName())) {
+				ccPropertiesToBeUpdated.add(ccProperty);
+			}
+
+		}
+		// remove from project level ops
+		// remove old collection
+		projectLevelOps.leftPop(project + ":" + environment);
+		// update new collection
+		projectLevelOps.leftPush(project + ":" + environment, convertProperty(ccPropertiesToBeUpdated));
+	}
+
+	@Override
+	public CCProperty getCCProperty(String propertyName, String project, String environment)
+			throws CloudConfigException {
+		List<String> result = propertyLevelOps.range(project + ":" + environment + ":" + propertyName, 0, 0);
 		if (result == null || result.size() == 0 || result.get(0) == null)
 			return null;
 
@@ -75,8 +103,7 @@ public class RedisConfigReaderWriter implements IConfigReaderWriter {
 	}
 
 	@Override
-	public Object getPropertyValue(String propertyName, String project,
-			String environment) throws CloudConfigException {
+	public Object getPropertyValue(String propertyName, String project, String environment) throws CloudConfigException {
 		CCProperty property = getCCProperty(propertyName, project, environment);
 		if (property == null)
 			return null;
@@ -85,8 +112,8 @@ public class RedisConfigReaderWriter implements IConfigReaderWriter {
 	}
 
 	@Override
-	public void saveProperty(String propertyName, Object propertyValue,
-			String project, String environment) throws CloudConfigException {
+	public void saveProperty(String propertyName, Object propertyValue, String project, String environment)
+			throws CloudConfigException {
 
 		CCProperty property = getCCProperty(propertyName, project, environment);
 
@@ -102,41 +129,51 @@ public class RedisConfigReaderWriter implements IConfigReaderWriter {
 	}
 
 	@Override
-	public Object getPropertyValue(String propertyName, String project)
+	public void deleteProperty(String propertyName, String project, String environment)
 			throws CloudConfigException {
+		CCProperty property = getCCProperty(propertyName, project, environment);
+		if (property != null)
+			deleteCCProperty(property, project, environment);
+
+	}
+
+	@Override
+	public Object getPropertyValue(String propertyName, String project) throws CloudConfigException {
 		String environment = getActiveEnvironment(project);
 		return getPropertyValue(propertyName, project, environment);
 	}
 
 	@Override
-	public void saveProperty(String propertyName, Object propertyValue,
-			String project) throws CloudConfigException {
+	public void saveProperty(String propertyName, Object propertyValue, String project) throws CloudConfigException {
 		String environment = getActiveEnvironment(project);
 		saveProperty(propertyName, propertyValue, project, environment);
 	}
 
 	@Override
-	public void saveCCProperty(CCProperty property, String project)
-			throws CloudConfigException {
+	public void deleteProperty(String propertyName, String project) throws CloudConfigException {
+		String environment = getActiveEnvironment(project);
+		deleteProperty(propertyName, project, environment);
+
+	}
+
+	@Override
+	public void saveCCProperty(CCProperty property, String project) throws CloudConfigException {
 		String environment = getActiveEnvironment(project);
 		saveCCProperty(property, project, environment);
 	}
 
 	@Override
-	public CCProperty getCCProperty(String propertyName, String project)
-			throws CloudConfigException {
+	public CCProperty getCCProperty(String propertyName, String project) throws CloudConfigException {
 		String environment = getActiveEnvironment(project);
 		return getCCProperty(propertyName, project, environment);
 	}
 
 	@Override
-	public List<CCProperty> getProjectEnvCCProperties(String project,
-			String environment) throws CloudConfigException {
+	public List<CCProperty> getProjectEnvCCProperties(String project, String environment) throws CloudConfigException {
 
 		checkProjectAndEnvironmentExist(project, environment);
 
-		List<List<String>> result = projectLevelOps.range(project + ":"
-				+ environment, 0, 0);
+		List<List<String>> result = projectLevelOps.range(project + ":" + environment, 0, 0);
 
 		if (result == null || result.size() == 0)
 			return new ArrayList<CCProperty>();
@@ -145,20 +182,17 @@ public class RedisConfigReaderWriter implements IConfigReaderWriter {
 	}
 
 	@Override
-	public void setActiveEnvironment(String project, String environment)
-			throws CloudConfigException {
+	public void setActiveEnvironment(String project, String environment) throws CloudConfigException {
 		checkProjectExist(project);
 
 		propertyLevelOps.leftPush("PROJECT:" + project, environment);
 	}
 
 	@Override
-	public String getActiveEnvironment(String project)
-			throws CloudConfigException {
+	public String getActiveEnvironment(String project) throws CloudConfigException {
 		checkProjectExist(project);
 
-		List<String> result = propertyLevelOps
-				.range("PROJECT:" + project, 0, 0);
+		List<String> result = propertyLevelOps.range("PROJECT:" + project, 0, 0);
 		if (result == null || result.size() == 0)
 			return null;
 
@@ -192,8 +226,7 @@ public class RedisConfigReaderWriter implements IConfigReaderWriter {
 	}
 
 	@Override
-	public void addEnvironmentToProject(String project, String environment)
-			throws CloudConfigException {
+	public void addEnvironmentToProject(String project, String environment) throws CloudConfigException {
 
 		checkProjectExist(project);
 
@@ -211,8 +244,7 @@ public class RedisConfigReaderWriter implements IConfigReaderWriter {
 	}
 
 	@Override
-	public List<String> getProjectEnvironments(String project)
-			throws CloudConfigException {
+	public List<String> getProjectEnvironments(String project) throws CloudConfigException {
 
 		checkProjectExist(project);
 
@@ -241,8 +273,7 @@ public class RedisConfigReaderWriter implements IConfigReaderWriter {
 
 	@Override
 	public List<String> listProjects() {
-		List<List<String>> result = projectLevelOps.range(
-				IConfigReaderWriter.PROJECT_LIST, 0, 0);
+		List<List<String>> result = projectLevelOps.range(IConfigReaderWriter.PROJECT_LIST, 0, 0);
 		if (result == null || result.size() == 0)
 			return new ArrayList<>();
 
@@ -252,26 +283,21 @@ public class RedisConfigReaderWriter implements IConfigReaderWriter {
 
 	private void checkProjectExist(String project) throws CloudConfigException {
 		if (!isProjectExist(project)) {
-			throw new CloudConfigException("No Project with name " + project
-					+ " found");
+			throw new CloudConfigException("No Project with name " + project + " found");
 		}
 	}
 
-	private void checkProjectAndEnvironmentExist(String project,
-			String environment) throws CloudConfigException {
+	private void checkProjectAndEnvironmentExist(String project, String environment) throws CloudConfigException {
 		if (!isProjectExist(project)) {
-			throw new CloudConfigException("No Project with name " + project
-					+ " found");
+			throw new CloudConfigException("No Project with name " + project + " found");
 		}
 
 		if (!isEnvironmentExist(project, environment)) {
-			throw new CloudConfigException("No Environment with name "
-					+ environment + " found for project " + project);
+			throw new CloudConfigException("No Environment with name " + environment + " found for project " + project);
 		}
 	}
 
-	private CCProperty convertString(String ccPropertyJson)
-			throws CloudConfigException {
+	private CCProperty convertString(String ccPropertyJson) throws CloudConfigException {
 		try {
 			return jsonMapper.readValue(ccPropertyJson, CCProperty.class);
 		} catch (IOException e) {
@@ -279,8 +305,7 @@ public class RedisConfigReaderWriter implements IConfigReaderWriter {
 		}
 	}
 
-	private List<CCProperty> convertString(List<String> ccPropertyJsonList)
-			throws CloudConfigException {
+	private List<CCProperty> convertString(List<String> ccPropertyJsonList) throws CloudConfigException {
 
 		if (ccPropertyJsonList == null)
 			return new ArrayList<CCProperty>();
@@ -293,8 +318,7 @@ public class RedisConfigReaderWriter implements IConfigReaderWriter {
 		return ccProperties;
 	}
 
-	private String convertProperty(CCProperty ccProperty)
-			throws CloudConfigException {
+	private String convertProperty(CCProperty ccProperty) throws CloudConfigException {
 		try {
 			return jsonMapper.writeValueAsString(ccProperty);
 		} catch (JsonProcessingException e) {
@@ -303,12 +327,11 @@ public class RedisConfigReaderWriter implements IConfigReaderWriter {
 
 	}
 
-	private List<String> convertProperty(List<CCProperty> ccProperties)
-			throws CloudConfigException {
-		
+	private List<String> convertProperty(List<CCProperty> ccProperties) throws CloudConfigException {
+
 		if (ccProperties == null)
 			return new ArrayList<String>();
-		
+
 		List<String> ccStringProperties = new ArrayList<String>();
 		for (CCProperty ccProperty : ccProperties) {
 			ccStringProperties.add(convertProperty(ccProperty));

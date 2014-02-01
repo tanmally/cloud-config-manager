@@ -46,6 +46,24 @@ public class PropertyToRedisStoreAndRetrieveTests {
 	}
 	
 	@Test
+	public void deletetest() throws CloudConfigException {
+		configReaderWriter.createProject("testprojec");
+		configReaderWriter.addEnvironmentToProject("testprojec", "prod");
+		
+		configReaderWriter.saveProperty("testProp", new Integer(9), "testprojec", "prod");
+		configReaderWriter.setActiveEnvironment("testprojec", "prod");
+		Integer val = (Integer) configReaderWriter.getPropertyValue("testProp",
+				"testprojec");
+		Assert.assertEquals(9, val.intValue());
+		
+		configReaderWriter.deleteProperty("testProp", "testprojec", "prod");
+		Object testProp = configReaderWriter.getPropertyValue("testProp",
+				"testprojec");
+		
+		Assert.assertNull(testProp);
+	}
+	
+	@Test
 	public void intStoreAndLoadWithoutActiveEnvironmentSettings() throws CloudConfigException {
 		configReaderWriter.saveProperty("testProp", new Integer(9), "testprojec", "prod");
 		configReaderWriter.setActiveEnvironment("testprojec", null);

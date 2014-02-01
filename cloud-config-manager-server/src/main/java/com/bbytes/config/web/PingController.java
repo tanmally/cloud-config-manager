@@ -10,7 +10,7 @@ public class PingController {
 	@RequestMapping("/ping")
 	@ResponseBody
 	public String greeting() {
-		return "Config manager, it works !!";
+		return "Cloud Config manager, it works !!";
 	}
 
 }

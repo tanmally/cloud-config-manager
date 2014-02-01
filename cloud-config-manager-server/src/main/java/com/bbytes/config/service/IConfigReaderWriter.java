@@ -13,17 +13,26 @@ public interface IConfigReaderWriter {
 
 	public void saveProperty(String propertyName, Object propertyValue,
 			String project, String environment) throws CloudConfigException;
+	
+	public void deleteProperty(String propertyName,
+			String project, String environment) throws CloudConfigException;
 
 	public Object getPropertyValue(String propertyName, String project)
 			throws CloudConfigException;
 
 	public void saveCCProperty(CCProperty property, String project,
 			String environment) throws CloudConfigException;
+	
+	public void deleteCCProperty(CCProperty property, String project,
+			String environment) throws CloudConfigException;
 
 	public CCProperty getCCProperty(String propertyName, String project,
 			String environment) throws CloudConfigException;
 
 	public void saveProperty(String propertyName, Object propertyValue,
+			String project) throws CloudConfigException;
+	
+	public void deleteProperty(String propertyName,
 			String project) throws CloudConfigException;
 
 	public void saveCCProperty(CCProperty property, String project)
