@@ -9,19 +9,14 @@
 		<artifactId>cloud-config-manager</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	
+
 	<artifactId>cloud-config-manager-server</artifactId>
+	<packaging>jar</packaging>
 
 	<name>cloud-config-manager-server</name>
 	<description>Configuration manager that can be accessed centrally </description>
 
-	
-	<properties>
-		<start-class>com.bbytes.config.Application</start-class>
-	</properties>
 
-
-	
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -53,6 +48,39 @@
 
 	</dependencies>
 
+
+	<properties>
+		<start-class>com.bbytes.config.Application</start-class>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${compiler.source.version}</source>
+					<target>${compiler.source.version}</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>${start-class}</mainClass>
+					<layout>ZIP</layout>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 	<repositories>
 		<repository>

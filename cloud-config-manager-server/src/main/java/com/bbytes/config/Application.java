@@ -11,10 +11,10 @@ import org.springframework.context.annotation.Configuration;
 public class Application {
 
 	public static void main(String[] args) {
-
 		SpringApplication app = new SpringApplication(
 				"classpath:/META-INF/app-context.xml", ConfigManagerSpringConfiguration.class);
 		app.setShowBanner(false);
+		app.setLogStartupInfo(false);
 		app.run(args);
 	}
 }

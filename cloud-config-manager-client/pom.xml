@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>cloud-config-manager-client</artifactId>
-	
+
 	<name>cloud-config-manager-client</name>
 	<description>Configuration manager client that can be accessed centrally </description>
 
@@ -44,7 +44,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.4</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -83,6 +82,17 @@
 
 	</dependencies>
 
-
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${compiler.source.version}</source>
+					<target>${compiler.source.version}</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
