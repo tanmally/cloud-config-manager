@@ -37,7 +37,7 @@ To return the project property list based on given environment
 
     GET /project/{project}/{environment}/property
 
-To eeturns the project property list based on active environment 
+To return the project property list based on active environment 
 
     GET /project/{project}/property
 
