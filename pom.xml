@@ -20,6 +20,30 @@
 		<jedis.version>2.0.0</jedis.version>
 	</properties>
 
+	<scm>
+		<url>https://github.com/bbytes/cloud-config-manager</url>
+		<connection>scm:git:ssh://github.com/bbytes/cloud-config-manager.git</connection>
+		<developerConnection>scm:git:git+ssh://git@github.com/bbytes/cloud-config-manager.git</developerConnection>
+	</scm>
+
+
+	<distributionManagement>
+		<repository>
+			<id>releases</id>
+			<url>http://repo.beyondbytes.co.in:8181/nexus/content/repositories/releases</url>
+		</repository>
+	</distributionManagement>
+
+	<developers>
+		<developer>
+			<name>Thanneermalai L</name>
+			<organization>Beyond Bytes Technologies Pvt Ltd</organization>
+			<email>tm@beyondbytes.co.in</email>
+			<url>www.beyondbytes.co.in</url>
+		</developer>
+	</developers>
+
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -76,6 +100,20 @@
 		</dependencies>
 	</dependencyManagement>
 
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.1</version>
+				<configuration>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
 
 	<modules>
 		<module>cloud-config-manager-server</module>
