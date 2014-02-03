@@ -1,8 +1,8 @@
 cloud-config-manager
 ====================
 
-Configuration manager that can be accessed centrally. Control all application property over the web in a secure way .
-The advantage is you can modify the application/project property and view the impact real time .
+Configuration manager that can be accessed centrally. Control all application properties over the web in a secure way .
+We can modify the application/project property and view the impact real time . This setup will be helpful if we run multiple instance of our app in cloud and we need elastic scaling , in this scenario we can modify the app properties centrally and all running instance would pick up the app properties from the cloud config manager without restarting the app.
 
 The basic structure of application/project property
 
