@@ -8,6 +8,8 @@
 	<context:annotation-config />
 	<context:property-placeholder />
 
+	<import resource="security-context.xml" />
+
 	<bean id="jedisConnFactory"
 		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"
 		p:use-pool="true" />
