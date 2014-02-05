@@ -1,6 +1,7 @@
 package com.bbytes.config.domain;
 
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.util.Date;
 
 /**
@@ -99,9 +100,7 @@ public class CCProperty implements Serializable {
 	}
 
 	public String toString() {
-		return "PropertyName:" + propertyName + ",  PropertyValue:"
-				+ propertyValue + ",  UpdateDate:"
-				+ updateDate.toLocaleString();
+		return "PropertyName:" + propertyName + ",  PropertyValue:" + propertyValue + ",  UpdateDate:"
+				+ DateFormat.getInstance().format(updateDate);
 	}
-
 }
