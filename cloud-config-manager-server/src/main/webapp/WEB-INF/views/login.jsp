@@ -1,7 +1,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <html>
-<title>Cloud Config Login 123</title>
+<title>Cloud Config Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link
 	href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css"

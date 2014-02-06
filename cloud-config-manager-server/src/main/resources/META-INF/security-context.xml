@@ -16,7 +16,7 @@
 			logout-success-url="/login" />
 		<form-login authentication-failure-url="/loginfailed"
 			login-page="/login" login-processing-url="/j_spring_security_check"
-			default-target-url="/index" always-use-default-target="true" />
+			default-target-url="/index" />
 	</http>
 	
 	<beans:bean id="adminAuthenticationProvider" class="com.bbytes.config.auth.AdminAuthenticationProvider"/>
