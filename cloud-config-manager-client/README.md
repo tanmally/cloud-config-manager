@@ -26,10 +26,11 @@ Build the project and add maven artifact to local repo as the lib is not publish
 		<property name="project" value="test" />
 		<!-- how freq the properties should be checked for update -->
 		<property name="pollDelay" value="10" />
-		<!-- config file path relative to this context xml file -->
+		<!-- config files in class path, same as spring config locations property  -->
 		<property name="configList">
 			<list>
-				<value>../sample.properties</value>
+				<value>classpath:sample.properties</value>
+				<value>classpath*:META-INF/conf.properties</value>
 			</list>
 		</property>
 	</bean>
