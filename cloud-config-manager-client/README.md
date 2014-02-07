@@ -22,7 +22,7 @@ Build the project and add maven artifact to local repo as the lib is not publish
 		<!-- cloud config server host & port -->
 		<property name="host" value="localhost" /> 
 		<property name="port" value="9000" />
-		<!-- project name the cloud config has to server -->
+		<!-- project name the cloud config has to serve -->
 		<property name="project" value="test" />
 		<!-- how freq the properties should be checked for update -->
 		<property name="pollDelay" value="10" />
