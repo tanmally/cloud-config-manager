@@ -22,14 +22,15 @@ Build the project and add maven artifact to local repo as the lib is not publish
 		<!-- cloud config server host & port -->
 		<property name="host" value="localhost" /> 
 		<property name="port" value="9000" />
-		<!-- project name the cloud config has to server -->
+		<!-- project name the cloud config has to serve -->
 		<property name="project" value="test" />
 		<!-- how freq the properties should be checked for update -->
 		<property name="pollDelay" value="10" />
-		<!-- config file path relative to this context xml file -->
+		<!-- config files in class path, same as spring config locations property  -->
 		<property name="configList">
 			<list>
-				<value>../sample.properties</value>
+				<value>classpath:sample.properties</value>
+				<value>classpath*:META-INF/conf.properties</value>
 			</list>
 		</property>
 	</bean>
